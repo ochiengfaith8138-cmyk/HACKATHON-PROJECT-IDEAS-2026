@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShambaSmart-Farm Smarter with Weather</title>
+    <link rel="stylesheet" href="shamba.css">
+</head>
+<body>
+    <header><h1>ShambaSmart</h1>
+    <nav class="nav-bar">
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">My Farm</a></li>
+            <li><a href="#">Crops</a></li>
+            <li><a href="#">Alert</a></li>
+        </ul>
+    </nav>
+    </header>
+    <div class="hero">
+        <h2>Farm Smarter with Weather</h2>
+        <p>Key in your location. Get weather, best crops to plant, and solutions to avoid losses.</p>
+      
+    </div>
+    <div class="search">
+        <label for="location">Enter your location:</label>
+        <input type="text" id="location" name="location" placeholder="KERICHO">
+        <button onclick="searchlocation()">Check My Farm arrow</button>   
+    </div>
+    <div  class="quick">
+        <span onclick="setLoc('Kerugoya')">Kerugoya</span>
+        <span onclick="setLoc('Mwea')">Mwea</span>
+        <span onclick="setLoc('Nairobi')">Nairobi</span>
+        <span onclick="setLoc('Eldoret')">Eldoret</span>
+        <span onclick="setLoc('Kisumu')">Kisumu</span>
+        <span onclick="setLoc('Mombasa')">Mombasa</span>
+    </div>
+    <p id="status"></p>
+    <div class="container">
+        <div class="weather card">
+            <h3  class="dev" id="locTitle">KERUGOYA TODAY</h3>
+        </div>
+        <div class="big" id="temp"> Loading...</div>
+        <p id="details">Fetching live weather...</p>
+        <div class="alert" id="alertBox">Tip:Loading advice</div>
+    </div>
+    <div class="card">
+        <h3>7-day forecast</h3>
+        <div class="forecast" id="forecast"></div>
+        <p id="solution"></p>
+    </div>
+<footer>Built for Kenyan Farmers. ShambaSmart Hackathon Project. Weather by Open-Meteo</footer>
+<script src="shamba.js"></script>
+</body>
+</html>
