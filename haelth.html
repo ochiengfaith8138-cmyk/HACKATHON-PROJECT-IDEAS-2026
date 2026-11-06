@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AfyaCheck - Smart Symptom Checker</title>
+    <style>
+        :root {
+            --primary: #007f5f;
+            --secondary: #2b9348;
+            --dark: #1c2541;
+            --light: #f8f9fa;
+            --danger: #d90429;
+            --border: #ced4da;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            padding-bottom: 60px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .disclaimer-banner {
+            background-color: #ffccd5;
+            color: var(--danger);
+            padding: 10px;
+            font-size: 0.85rem;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid #ffb3c1;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 5px;
+        }
+
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .symptom-tag {
+            background: var(--light);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            user-select: none;
+            font-size: 0.95rem;
+        }
+
+        .symptom-tag.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--secondary);
+        }
+
+        .illness-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .illness-item:hover {
+            transform: scale(1.01);
+            border-color: var(--primary);
+        }
+
+        .match-badge {
+            background: #e2f0d9;
+            color: #385723;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 25px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--border);
+        }
+
+        .facility-card {
+            border-left: 4px solid var(--primary);
+            background: var(--light);
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .facility-card.private {
+            border-left-color: #fd7e14;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .bg-public { background-color: var(--primary); }
+        .bg-private { background-color: #fd7e14; }
+
+        .hidden { display: none !important; }
+        
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="disclaimer-banner">
+        ⚠️ AfyaCheck provides information only. Not a formal diagnosis. In emergency, visit a hospital immediately.
+    </div>
+
+    <header>
+        <h1>AfyaCheck 🇰🇪</h1>
+        <p>Smart Symptom Checker & Facility Finder</p>
+    </header>
+
+    <main>
+        <!-- Step 1: Symptom Checker -->
+        <section id="step-symptoms" class="card">
+            <h2>1. Select Your Symptoms</h2>
+            <div class="symptom-grid" id="symptoms-container"></div>
+            <button onclick="analyzeSymptoms()">Check Possible Illnesses</button>
+        </section>
+
+        <!-- Step 2: Assessment Results -->
+        <section id="step-results" class="card hidden">
+            <h2>2. Possible Conditions</h2>
+            <div id="illness-list"></div>
+            <button style="margin-top: 10px; background: #6c757d;" onclick="resetToSymptoms()">Back to Symptoms</button>
+        </section>
+
+        <!-- Step 3: Location / Facility Finder -->
+        <section id="step-facilities" class="card hidden">
+            <h2>3. Nearby Health Facilities</h2>
+            <p style="font-size:0.9rem; margin-bottom:10px; color:#555;">Showing closest options relative to your location.</p>
+            <div id="facilities-list"></div>
+        </section>
+
+        <!-- Step 4: Booking Confirmation Status -->
+        <section id="step-confirmation" class="card hidden">
+            <div style="text-align: center; color: var(--secondary);">
+                <h2>🎉 Appointment Reserved Successfully!</h2>
+                <div id="summary-details" style="text-align: left; background: var(--light); padding: 15px; margin: 15px 0; border-radius: 8px; font-size:0.95rem;"></div>
+                <button onclick="location.reload()">Start Over / New Checker</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Illness Detail Sheet Modal -->
+    <div id="illness-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('illness-modal')">&times;</span>
+            <h2 id="modal-illness-name">Illness Name</h2>
+            <div id="modal-illness-details" style="font-size:0.95rem; line-height:1.5; margin-bottom:20px;"></div>
+            <button onclick="proceedToFacilities()">Find Near Affordable Facilities For This</button>
+        </div>
+    </div>
+
+    <!-- Booking Form Sheet Modal -->
+    <div id="booking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('booking-modal')">&times;</span>
+            <h2 id="modal-booking-facility">Book Appointment</h2>
+            <form id="appointment-form" onsubmit="confirmBooking(event)">
+                <div class="form-group">
+                    <label>Select Doctor</label>
+                    <select id="book-doctor" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Date</label>
+                    <input type="date" id="book-date" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Time Slot</label>
+                    <select id="book-time" required>
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="11:30 AM">11:30 AM</option>
+                        <option value="02:00 PM">02:00 PM</option>
+                        <option value="04:30 PM">04:30 PM</option>
+                    </select>
+                </div>
+                <button type="submit">Submit Appointment Reservation</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- MOCK DATABASE ---
+        const SYMPTOMS = ["Fever", "Headache", "Cough", "Stomach Pain", "Chills", "Nausea"];
+
+        const ILLNESSES = [
+            {
+                name: "Malaria",
+                symptoms: ["Fever", "Headache", "Chills", "Nausea"],
+                desc: "A serious disease caused by a parasite that infects a certain type of mosquito which feeds on humans.",
+                causes: "Anopheles mosquito bites.",
+                prevention: "Sleep under treated mosquito nets, use insect repellent.",
+                urgent: "If experiencing persistent high fever, vomiting or yellowing eyes."
+            },
+            {
+                name: "Common Cold / Flu",
